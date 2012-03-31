@@ -7,18 +7,14 @@ module Local
     @childout = childio[0]
     @childin = childio[1]
     @childpid = childio[2]
-    @childin.write("y ")
+    @childin.write("y Of    ")
     system "stty cbreak </dev/tty >/dev/tty 2>&1";
     system "stty -echo </dev/tty >/dev/tty 2>&1";
-    while PTY.check(@childpid) == nil
-      receive
-      transmit
-    end
-    system "stty -cbreak </dev/tty >/dev/tty 2>&1";
-    system "stty echo </dev/tty >/dev/tty 2>&1";
   end
     
   def self.stop
+    system "stty -cbreak </dev/tty >/dev/tty 2>&1";
+    system "stty echo </dev/tty >/dev/tty 2>&1";
   end
 
   def self.receive
@@ -43,5 +39,9 @@ module Local
       return
     end
     @childin.write c
+  end
+
+  def self.running?
+    PTY.check(@childpid) == nil
   end
 end
