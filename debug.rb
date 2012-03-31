@@ -1,17 +1,28 @@
 module Debug
   def self.start
-    @@file = open("./debug.log", "a")
-    print("Opened %s for writing", @@file.path)
+    @@logfile = open("./debug.log", "a")
+    log("Opened %s for writing", @@logfile.path)
+    @@rawfile = open("./raw.log", "a")
+    log("Opened %s for writing", @@rawfile.path)
   end
 
   def self.stop
-    @@file.close
+    @@logfile.close
+    @@rawfile.close
   end
 
-  def self.print (str, *args)
+  def self.print (file, str, *args)
     return if str.strip == ""
-    str.tr!("%","")
-    @@file.printf(str + "\n", args)
-    @@file.flush
+    file.printf(str + "\n", args)
+    file.flush
+  end
+
+  def self.log (str, *args)
+    print(@@logfile, str, *args)
+  end
+
+  def self.raw (str, *args)
+    str.sub!("%","%%")
+    print(@@rawfile, str, *args)
   end
 end
