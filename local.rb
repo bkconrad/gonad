@@ -44,4 +44,8 @@ module Local
   def self.running?
     PTY.check(@childpid) == nil
   end
+
+  def self.waiting?
+    
+  end
 end
