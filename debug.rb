@@ -9,10 +9,7 @@ module Debug
   end
 
   def self.print (str, *args)
-    if str == ""
-      return
-    end
-    #str = str.unpack("a*").join()
+    return if str.strip == ""
     str.tr!("%","")
     @@file.printf(str + "\n", args)
     @@file.flush
