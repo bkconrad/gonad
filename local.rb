@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+require 'pty'
+module Local
+  
+  def self.start
+    childio = PTY.spawn("nethack", "rw")
+    @childout = childio[0]
+    @childin = childio[1]
+    @childpid = childio[2]
+    @childin.write("y ")
+    system "stty cbreak </dev/tty >/dev/tty 2>&1";
+    system "stty -echo </dev/tty >/dev/tty 2>&1";
+    while PTY.check(@childpid) == nil
+      receive
+      transmit
+    end
+    system "stty -cbreak </dev/tty >/dev/tty 2>&1";
+    system "stty echo </dev/tty >/dev/tty 2>&1";
+  end
+    
+  def self.stop
+  end
+
+  def self.receive
+    while true
+      begin
+        char = @childout.read_nonblock(1)
+      rescue IO::WaitReadable
+        return
+      end
+
+      if char == nil
+        return
+      end
+      putc char
+    end
+  end
+
+  def self.transmit
+    begin
+      c = STDIN.read_nonblock(1)
+    rescue IO::WaitReadable
+      return
+    end
+    @childin.write c
+  end
+end
