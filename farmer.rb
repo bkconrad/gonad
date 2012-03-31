@@ -6,7 +6,7 @@ interface_module = Local
 interface_module.start
 Debug.start
 while interface_module.running?
-  interface_module.receive
+  Debug.print(interface_module.receive)
   interface_module.transmit
 end
 Debug.stop

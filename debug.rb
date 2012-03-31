@@ -9,6 +9,11 @@ module Debug
   end
 
   def self.print (str, *args)
+    if str == ""
+      return
+    end
+    #str = str.unpack("a*").join()
+    str.tr!("%","")
     @@file.printf(str + "\n", args)
     @@file.flush
   end

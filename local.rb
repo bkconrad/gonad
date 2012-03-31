@@ -18,16 +18,15 @@ module Local
   end
 
   def self.receive
+    received = ""
     while true
       begin
         char = @childout.read_nonblock(1)
       rescue IO::WaitReadable
-        return
+        return received
       end
 
-      if char == nil
-        return
-      end
+      received += char
       putc char
     end
   end
