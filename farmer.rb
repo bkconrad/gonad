@@ -23,9 +23,9 @@ class Farmer
       Debug.raw(received)
       Parser.parse(received)
       @interface.transmit
+      sleep(0.01)
     end
   end
-  
 end
 
 Farmer.new
