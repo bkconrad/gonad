@@ -1,53 +1,60 @@
 require "./debug"
 module Parser
-  class CursorStatus
-    attr_accessor :row, :col, :fg, :bg
-    def to_s
-      "%i, %i" % [@row, @col]
+  attr_accessor :row, :col, :fg, :bg
+  @row = 1
+  @col = 1
+  def self.position
+    "%i, %i" % [@row, @col]
+  end
+
+  def self.initialize row=0, col=0
+    set row, col
+  end
+
+  def self.set *args
+    if args[0].kind_of? Array
+      row = args[0][0]
+      col = args[0][1]
+    else
+      row = args[0]
+      col = args[1]
+    end
+    if row == ""
+      row = 1
+    end
+    if col == ""
+      col = 1
     end
 
-    def initialize row=0, col=0
-      set row, col
-    end
+    @row = row.to_i unless row == -1
+    @col = col.to_i unless col == -1
+  end
 
-    def set *args
-      if args[0].kind_of? Array
-        row = args[0][0]
-        col = args[0][1]
-      else
-        row = args[0]
-        col = args[1]
-      end
-      if row == ""
-        row = 1
-      end
-      if col == ""
-        col = 1
-      end
-
-      @row = row.to_i
-      @col = col.to_i
+  def self.add *args
+    if args[0].kind_of? Array
+      row = args[0][0]
+      col = args[0][1]
+    else
+      row = args[0]
+      col = args[1]
     end
+    @row += row.to_i
+    @col += col.to_i
+  end
 
-    def add *args
-      if args[0].kind_of? Array
-        row = args[0][0]
-        col = args[0][1]
-      else
-        row = args[0]
-        col = args[1]
-      end
-      @row += row.to_i
-      @col += col.to_i
+  def self.clear_line *args
+    Debug.log("clearing line %s", args.join)
+    if @col == 23
     end
+    #@col = 1
+  end
 
-    def increment
-      @col += 1
-    end
+  def self.increment
+    @col += 1
+  end
 
-    def decrement
-      @col -= 1
-    end
+  def self.decrement
+    @col -= 1
   end
 
   ESC="\e"
@@ -84,12 +91,17 @@ module Parser
       j -= 1
 
 # send chunk through the proper handler
-      if LINEHANDLERS.include? @pos.row
-        self.send(LINEHANDLERS[@pos.row], str[i..j])
+      if LINEHANDLERS.include? @row
+        self.send(LINEHANDLERS[@row], str[i..j])
         i = j
       end
 
-      @pos.increment
+      if str[i] == "\r"
+        add 1, 0
+        set -1, 1
+      end
+
+      increment
       i += 1
     end
   end
@@ -113,11 +125,11 @@ module Parser
 
       if method_args.kind_of?(Regexp)
         matches = method_args.match(str[i..j])
-        method_args = matches[1..2]
+        method_args = matches.to_a[1..-1]
       end
 
-      @pos.send(method, method_args)
-      # Debug.log("Set cursor position to %s", @pos)
+      self.send(method, method_args)
+      Debug.log("Set cursor position to %s", position)
     end
 
     j - i
@@ -128,7 +140,14 @@ module Parser
   end
 
   def self.parse_attribute_line str
-    Debug.log("Found attribute %s", str)
+    i = @col - 1
+    str.each_char do |c|
+      return if c == "\e"
+      @attributes[i] = c unless c == "\r"
+      i += 1
+    end
+    #@attributes = [@attributes[-1..i].to_s, str, @attributes[i + str.length..@attributes.length-1]].join
+    Debug.log("Found attribute %s", @attributes)
   end
 
   def self.parse_status_line str
