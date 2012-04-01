@@ -3,14 +3,29 @@ require "./local"
 require "./debug"
 require "./parser"
 
-interface_module = Local
-interface_module.start
-Debug.start
-while interface_module.running?
-  received = interface_module.receive
-  Debug.raw(received)
-  Parser.parse(received)
-  interface_module.transmit
+class Farmer
+  def initialize
+    @interface = Local
+    @interface.start
+    Debug.start
+    play
+    shutdown
+  end
+
+  def shutdown
+    Debug.stop
+    @interface.stop
+  end
+
+  def play
+    while @interface.running?
+      received = @interface.receive
+      Debug.raw(received)
+      Parser.parse(received)
+      @interface.transmit
+    end
+  end
+  
 end
-Debug.stop
-interface_module.stop
+
+Farmer.new
