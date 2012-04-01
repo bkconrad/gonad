@@ -1,4 +1,13 @@
+# I'd rather make this an enum
+NONE = 0
+ERROR = 1
+LOG = 2
+WARN = 3
+DEBUG = 4
+EXTRA = 5
+
 module Debug
+  @@debuglevel = DEBUG 
   def self.start
     @@logfile = open("./debug.log", "a")
     log("Opened %s for writing", @@logfile.path)
@@ -17,8 +26,8 @@ module Debug
     file.flush
   end
 
-  def self.log (str, *args)
-    print(@@logfile, str, *args)
+  def self.print_to_log (level, str, *args)
+    print(@@logfile, str, *args) if @@debuglevel >= level
   end
 
   def self.raw (str, *args)
@@ -26,4 +35,20 @@ module Debug
     end
     print(@@rawfile, str + "\n", *args)
   end
+end
+  
+def log str, *args
+  Debug.print_to_log LOG, str, *args
+end
+
+def err str, *args
+  Debug.print_to_log ERROR, str, *args
+end
+
+def dbg str, *args
+  Debug.print_to_log DEBUG, str, *args
+end
+
+def extra str, *args
+  Debug.print_to_log EXTRA, str, *args
 end

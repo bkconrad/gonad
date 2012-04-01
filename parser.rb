@@ -67,7 +67,7 @@ module Parser
   end
 
   def self.clear_line *args
-    Debug.log("clearing line %s", args.join)
+    dbg("clearing line %s", args.join)
     return unless LINEHANDLERS.include? @row
     for i in @col-1..TERMWIDTH
       @@line_contents[LINEHANDLERS[@row]][i] = " "
@@ -131,9 +131,9 @@ module Parser
     end
 
     if @@messages != []
-      Debug.log("New Messages:")
+      dbg("New Messages:")
       @@messages.each do |str|
-        Debug.log(str)
+        dbg(str)
       end
     end
   end
@@ -142,13 +142,13 @@ module Parser
     j = i + 1
     while !CODES.include?(str[j]) && j < str.length
       if str[j] == ESC
-        Debug.log("unexpected escape in %s", str[i..j])
+        dbg("unexpected escape in %s", str[i..j])
         exit
       end
       j += 1
     end
 
-    # Debug.log("Found escape code %s", str[i..j])
+    # dbg("Found escape code %s", str[i..j])
 
     action = CODES[str[j]]
     if action != nil
@@ -161,7 +161,7 @@ module Parser
       end
 
       self.send(method, method_args)
-      Debug.log("Set cursor position to %s", position)
+      dbg("Set cursor position to %s", position)
     end
 
     j - i
@@ -169,15 +169,15 @@ module Parser
 
   def self.parse_top_line str, chunk
     @@messages.push(chunk)
-    Debug.log("Found message %s", str)
+    dbg("Found message %s", str)
   end
 
   def self.parse_attribute_line str, chunk
     #@attributes = [@attributes[-1..i].to_s, str, @attributes[i + str.length..@attributes.length-1]].join
-    Debug.log("Found attribute %s", @attributes)
+    dbg("Found attribute %s", @attributes)
   end
 
   def self.parse_status_line str, chunk
-    Debug.log("Found status %s", str)
+    dbg("Found status %s", str)
   end
 end
