@@ -43,6 +43,7 @@ end
 
 def err str, *args
   Debug.print_to_log ERROR, str, *args
+  exit
 end
 
 def dbg str, *args

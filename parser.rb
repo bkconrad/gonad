@@ -1,4 +1,5 @@
 require "./debug"
+require "./knowledge"
 module Parser
   attr_accessor :row, :col, :fg, :bg
 
@@ -85,10 +86,11 @@ module Parser
     i = 0
     while i < str.length
       # handles pure escape code chunks (no printable characters output to term)
+      j = i
       while str[i] == ESC
         # parse_escape returns the number of characters handled
-        i += parse_escape str, i
-        i += 1
+        # we must move to the character after the last one handled
+        i += 1 + parse_escape(str, i)
       end
 
       # grab a chunk of characters between two escape sequences
@@ -143,9 +145,12 @@ module Parser
 
   def self.parse_escape str, i
     j = i + 1
-    while !CODES.include?(str[j]) && j < str.length
+    while !CODES.include?(str[j])
       if str[j] == ESC
         err("unexpected escape in %s", str[i..j])
+      end
+      if j >= str.length
+        err("Unclosed escape sequence\n%s", str[i..-1])
       end
       j += 1
     end
@@ -176,10 +181,11 @@ module Parser
 
   def self.parse_attribute_line str, chunk
     #@attributes = [@attributes[-1..i].to_s, str, @attributes[i + str.length..@attributes.length-1]].join
-    extra("Found attribute %s", @attributes)
+    Knowledge.parse_attributes str
   end
 
   def self.parse_status_line str, chunk
+    Knowledge.parse_status str
     extra("Found status %s", str)
   end
 
