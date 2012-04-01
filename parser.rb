@@ -31,10 +31,6 @@ module Parser
     "%i, %i" % [@row, @col]
   end
 
-  def self.initialize row=0, col=0
-    set row, col
-  end
-
   def self.set *args
     if args[0].kind_of? Array
       row = args[0][0]

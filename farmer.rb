@@ -6,6 +6,7 @@ require "./parser"
 
 $options = {}
 class Farmer
+
   def initialize
     $options = ARGV.getopts("","loglevel:","wizard")
     @interface = Local
