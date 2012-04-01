@@ -84,13 +84,14 @@ module Parser
     @@messages = []
     i = 0
     while i < str.length
+      # handles pure escape code chunks (no printable characters output to term)
       while str[i] == ESC
         # parse_escape returns the number of characters handled
         i += parse_escape str, i
         i += 1
       end
 
-      # grab a chunk
+      # grab a chunk of characters between two escape sequences
       j = i
       while str[j] != ESC && j < str.length
         j += 1
@@ -129,9 +130,14 @@ module Parser
     if @@messages != []
       dbg("New Messages:")
       @@messages.each do |str|
+        if /--More--/.match(str)
+          return handle_more
+        end
         dbg(str)
       end
     end
+
+    return nil
   end
 
   def self.parse_escape str, i
@@ -174,5 +180,9 @@ module Parser
 
   def self.parse_status_line str, chunk
     extra("Found status %s", str)
+  end
+
+  def self.handle_more
+    return " "
   end
 end
