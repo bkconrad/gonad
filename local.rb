@@ -35,13 +35,8 @@ module Local
     return received
   end
 
-  def self.transmit
-    begin
-      c = STDIN.read_nonblock(1)
-    rescue IO::WaitReadable
-      return
-    end
-    @childin.write c
+  def self.transmit str
+    @childin.write str
   end
 
   def self.running?
