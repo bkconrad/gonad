@@ -85,6 +85,7 @@ module Parser
 
 
   def self.parse str
+    @@messages = []
     i = 0
     while i < str.length
       while str[i] == ESC
@@ -113,7 +114,7 @@ module Parser
           @@line_contents[rowname][k] = c unless c == "\r"
           k += 1
         end
-        self.send(handler, @@line_contents[rowname])
+        self.send(handler, @@line_contents[rowname], str[i..j])
 
         # advance i if this chunk was handled
         increment j - i
@@ -127,6 +128,13 @@ module Parser
 
       increment
       i += 1
+    end
+
+    if @@messages != []
+      Debug.log("New Messages:")
+      @@messages.each do |str|
+        Debug.log(str)
+      end
     end
   end
 
@@ -159,16 +167,17 @@ module Parser
     j - i
   end
 
-  def self.parse_top_line str
+  def self.parse_top_line str, chunk
+    @@messages.push(chunk)
     Debug.log("Found message %s", str)
   end
 
-  def self.parse_attribute_line str
+  def self.parse_attribute_line str, chunk
     #@attributes = [@attributes[-1..i].to_s, str, @attributes[i + str.length..@attributes.length-1]].join
     Debug.log("Found attribute %s", @attributes)
   end
 
-  def self.parse_status_line str
+  def self.parse_status_line str, chunk
     Debug.log("Found status %s", str)
   end
 end
