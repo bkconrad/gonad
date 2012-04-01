@@ -61,16 +61,34 @@ module Parser
          "H" => {set: /\e\[(\d*);?(\d*)H/},
          "K" => nil}
 
+  LINEHANDLERS={1 => :parse_topline,
+                23 => :parse_attribute_line,
+                24 => :parse_status_line}
+
+
   def self.parse str
     @pos = CursorStatus.new
     i = 0
     while i < str.length
-      if str[i] == ESC
+      while str[i] == ESC
         # parse_escape returns the number of characters handled
         i += parse_escape str, i
-      elsif @pos.row == 1
-        i += parse_topline str, i
+        i += 1
       end
+
+# grab a chunk
+      j = i
+      while str[j] != ESC && j < str.length
+        j += 1
+      end
+      j -= 1
+
+# send chunk through the proper handler
+      if LINEHANDLERS.include? @pos.row
+        self.send(LINEHANDLERS[@pos.row], str[i..j])
+        i = j
+      end
+
       @pos.increment
       i += 1
     end
@@ -78,7 +96,7 @@ module Parser
 
   def self.parse_escape str, i
     j = i + 1
-    while !CODES.include?(str[j])
+    while !CODES.include?(str[j]) && j < str.length
       if str[j] == ESC
         Debug.log("unexpected escape in %s", str[i..j])
         exit
@@ -105,13 +123,15 @@ module Parser
     j - i
   end
 
-  def self.parse_topline str, i
-    j = i + 1
-    while str[j] != ESC && j < str.length
-      j += 1
-    end
-    j -= 1
-    Debug.log("Found message %s", str[i..j])
-    j - i
+  def self.parse_topline str
+    Debug.log("Found message %s", str)
+  end
+
+  def self.parse_attribute_line str
+    Debug.log("Found attribute %s", str)
+  end
+
+  def self.parse_status_line str
+    Debug.log("Found status %s", str)
   end
 end

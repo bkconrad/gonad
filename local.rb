@@ -22,13 +22,13 @@ module Local
     while true
       begin
         char = @childout.read_nonblock(1)
+        received += char
+        putc char
       rescue IO::WaitReadable
         return received
       end
-
-      received += char
-      putc char
     end
+    return received
   end
 
   def self.transmit
