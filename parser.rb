@@ -69,7 +69,7 @@ module Parser
   def self.clear_line *args
     Debug.log("clearing line %s", args.join)
     return unless LINEHANDLERS.include? @row
-    for i in @col..TERMWIDTH
+    for i in @col-1..TERMWIDTH
       @@line_contents[LINEHANDLERS[@row]][i] = " "
     end
     #@col = 1
