@@ -1,10 +1,13 @@
 #!/usr/bin/env ruby
+require "optparse"
 require "./local"
 require "./debug"
 require "./parser"
 
+$options = {}
 class Farmer
   def initialize
+    $options = ARGV.getopts("","loglevel:","wizard")
     @interface = Local
     @interface.start
     Debug.start

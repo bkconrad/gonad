@@ -7,8 +7,8 @@ DEBUG = 4
 EXTRA = 5
 
 module Debug
-  @@debuglevel = DEBUG 
   def self.start
+    @@debuglevel = ($options["loglevel"] || DEBUG).to_i
     @@logfile = open("./debug.log", "a")
     log("Opened %s for writing", @@logfile.path)
     @@rawfile = open("./raw.log", "a")

@@ -3,7 +3,11 @@ require 'pty'
 module Local
   
   def self.start
-    childio = PTY.spawn("sudo -u wizard nethack -D")
+    if $options["wizard"]
+      childio = PTY.spawn("sudo -u wizard nethack -D")
+    else
+      childio = PTY.spawn("nethack")
+    end
     @childout = childio[0]
     @childin = childio[1]
     @childpid = childio[2]
