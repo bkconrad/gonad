@@ -22,7 +22,8 @@ module Debug
   end
 
   def self.raw (str, *args)
-    str.sub!("%","%%")
-    print(@@rawfile, str, *args)
+    while str.sub!(/([^%])%([^%])/,"\\1%%\\2")
+    end
+    print(@@rawfile, str + "\n", *args)
   end
 end
