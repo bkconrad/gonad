@@ -3,11 +3,11 @@ require 'pty'
 module Local
   
   def self.start
-    childio = PTY.spawn("nethack", "rw")
+    childio = PTY.spawn("sudo -u wizard nethack -D")
     @childout = childio[0]
     @childin = childio[1]
     @childpid = childio[2]
-    @childin.write("y Of    ")
+    @childin.write("y    Of      ")
     system "stty cbreak </dev/tty >/dev/tty 2>&1";
     system "stty -echo </dev/tty >/dev/tty 2>&1";
   end
