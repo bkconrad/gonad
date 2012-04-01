@@ -30,8 +30,9 @@ class Farmer
       received = @interface.receive
       Debug.raw(received)
       parser_instructions = Parser.parse(received)
+      human_input = get_human_input
       if @human_override
-        @interface.transmit get_human_input
+        @interface.transmit human_input
       else
         @interface.transmit parser_instructions || next_task.perform
       end
@@ -41,10 +42,15 @@ class Farmer
 
   def get_human_input
     begin
-      return STDIN.read_nonblock(1)
+      input = STDIN.read_nonblock(1)
     rescue IO::WaitReadable
       return
     end
+    if input == "\x1D"
+      @human_override = !@human_override
+      return nil
+    end
+    return input
   end
 end
 
