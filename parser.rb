@@ -66,15 +66,16 @@ module Parser
          "h" => nil,
          "J" => nil,
          "H" => {set: /\e\[(\d*);?(\d*)H/},
-         "K" => nil}
+         "K" => {clear_line: /\e\[(\d)*K/}
+  }
 
-  LINEHANDLERS={1 => :parse_topline,
+  LINEHANDLERS={ 1 => :parse_topline,
                 23 => :parse_attribute_line,
                 24 => :parse_status_line}
 
 
   def self.parse str
-    @pos = CursorStatus.new
+    @attributes = " "*160 unless @attributes
     i = 0
     while i < str.length
       while str[i] == ESC
