@@ -1,11 +1,7 @@
 require "./debug"
 module Parser
-  class ColorCode
-    attr_accessor :fg, :bg
-  end
-
-  class Position
-    attr_accessor :row, :col
+  class CursorStatus
+    attr_accessor :row, :col, :fg, :bg
     def to_s
       "%i, %i" % [@row, @col]
     end
@@ -66,7 +62,7 @@ module Parser
          "K" => nil}
 
   def self.parse str
-    @pos = Position.new
+    @pos = CursorStatus.new
     i = 0
     while i < str.length
       if str[i] == ESC
