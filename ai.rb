@@ -1,3 +1,4 @@
+require "./knowledge"
 module AI
   @@tasks = []
   @@parameters = []

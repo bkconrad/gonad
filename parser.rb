@@ -98,6 +98,10 @@ module Parser
       end
       j -= 1
 
+      if /--More--/.match(str[i..j])
+        return handle_more
+      end
+
       # send chunk through the proper handler
       if LINEHANDLERS.include? @row
         rowname = LINEHANDLERS[@row]
@@ -130,9 +134,6 @@ module Parser
     if @@messages != []
       dbg("New Messages:")
       @@messages.each do |str|
-        if /--More--/.match(str)
-          return handle_more
-        end
         dbg(str)
       end
     end
