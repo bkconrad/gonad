@@ -19,6 +19,7 @@ module Local
   def self.stop
     system "stty -cbreak </dev/tty >/dev/tty 2>&1";
     system "stty echo </dev/tty >/dev/tty 2>&1";
+    system "reset"
   end
 
   def self.receive
