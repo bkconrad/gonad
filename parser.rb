@@ -23,6 +23,6 @@ module Parser
   end
 
   def self.handle_more
-    return " "
+    return " " if /--More--/.match(str)
   end
 end
