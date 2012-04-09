@@ -24,7 +24,7 @@ module Debug
 
   def self.print (file, str, *args)
     return if str.strip == ""
-    file.printf(str + "\n", args)
+    file.printf(str + "\n", *args)
     file.flush
   end
 
