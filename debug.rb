@@ -13,6 +13,8 @@ module Debug
     log("Opened %s for writing", @@logfile.path)
     @@rawfile = open("./raw.log", "a")
     log("Opened %s for writing", @@rawfile.path)
+    @@termfile = open("./term.log", "a")
+    log("Opened %s for writing", @@termfile.path)
   end
 
   def self.stop
@@ -35,6 +37,10 @@ module Debug
     end
     print(@@rawfile, str + "\n", *args)
   end
+
+  def self.term (str)
+    @@termfile.print(str)   
+  end
 end
   
 def log str, *args
@@ -52,4 +58,8 @@ end
 
 def extra str, *args
   Debug.print_to_log EXTRA, str, *args
+end
+
+def term str
+  Debug.term str
 end
