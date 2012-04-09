@@ -29,12 +29,12 @@ class Farmer
     while @interface.running?
       received = @interface.receive
       Debug.raw(received)
-      parser_instructions = Parser.parse(received)
+      parser_instructions = Parser.parse(received) if received.length > 0
       human_input = get_human_input
       if @human_override
         @interface.transmit human_input
       else
-        @interface.transmit parser_instructions || next_task.perform
+        @interface.transmit(parser_instructions || next_task.perform)
       end
       sleep(0.01)
     end
