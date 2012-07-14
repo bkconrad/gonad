@@ -8,8 +8,9 @@ module Parser
     for action in ACTIONS
       # this doesn't work for static methods.
       result = Parser.send(action, str)
-      return result
+      return result unless result === nil
     end
+    return nil
   end
 
   def self.parse_top_line str, chunk
@@ -28,6 +29,6 @@ module Parser
   end
 
   def self.handle_more str
-    return " " if /--More--/.match(str)
+    return /--More--/.match(str) ? ' ' : nil
   end
 end
