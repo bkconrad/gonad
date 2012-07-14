@@ -29,7 +29,8 @@ class Farmer
     while @interface.running?
       received = @interface.receive
       Debug.raw(received)
-      parser_instructions = Parser.parse(received) if received.length > 0
+      parser_instructions = Parser.parse(received)
+      dbg("Sending parser instructions:\n'%s'",parser_instructions) if parser_instructions != ""
       human_input = get_human_input
       if @human_override
         @interface.transmit human_input

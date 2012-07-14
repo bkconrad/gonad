@@ -2,9 +2,14 @@ require "./debug"
 require "./knowledge"
 require "./vt"
 module Parser
+  ACTIONS = [ :handle_more ]
   def self.parse str
     VT.parse str
-    return nil
+    for action in ACTIONS
+      # this doesn't work for static methods.
+      result = Parser.send(action, str)
+      return result
+    end
   end
 
   def self.parse_top_line str, chunk
@@ -22,7 +27,7 @@ module Parser
     extra("Found status %s", str)
   end
 
-  def self.handle_more
+  def self.handle_more str
     return " " if /--More--/.match(str)
   end
 end

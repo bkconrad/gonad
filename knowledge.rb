@@ -22,7 +22,7 @@ module Knowledge
     @player.int = result[5].to_i
     @player.wis = result[6].to_i
     @player.cha = result[7].to_i
-    #dbg("Str: %s\nDex: %s\nCon: %s\nInt: %s\n", @player.str, @player.dex, @player.con, @player.int)
+    dbg("Str: %s\nDex: %s\nCon: %s\nInt: %s\n", @player.str, @player.dex, @player.con, @player.int)
   end
 
   def self.parse_status str
