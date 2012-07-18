@@ -14,10 +14,6 @@ module VT
          "K" => {clear_line: /\e\[(\d)*K/}
   }
 
-  LINEHANDLERS={ 1 => "top_line",
-                23 => "attribute_line",
-                24 => "status_line"}
-
   TERMWIDTH=80
   TERMHEIGHT=24
 

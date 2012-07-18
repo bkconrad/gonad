@@ -2,6 +2,11 @@ require "./debug"
 require "./knowledge"
 require "./vt"
 module Parser
+
+  LINEHANDLERS={ 1 => "top_line",
+                23 => "attribute_line",
+                24 => "status_line"}
+
   ACTIONS = [ :handle_more ]
   def self.parse str
     VT.parse str
