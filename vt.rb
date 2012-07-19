@@ -1,3 +1,4 @@
+require "./glyph"
 require "./debug"
 module VT
   attr_accessor :row, :col, :fg, :bg
@@ -7,7 +8,7 @@ module VT
          "B" => {add: [1, 0]},
          "C" => {add: [0, 1]},
          "D" => {add: [0, -1]},
-         "m" => nil,
+         "m" => {set_color: /\e\[(\d+)m/},
          "h" => nil,
          "J" => {clear_data: /\e\[(\d)*J/},
          "H" => {set: /\e\[(\d*);?(\d*)H/},
@@ -19,7 +20,7 @@ module VT
 
   @line_contents = {}
   for i in 0..TERMHEIGHT
-    @line_contents[i] = " " * TERMWIDTH
+    @line_contents[i] = [].fill Glyph.new, 0...TERMWIDTH
   end
 
   @row = 1
@@ -46,6 +47,11 @@ module VT
 
     @row = row.to_i unless row == -1
     @col = col.to_i unless col == -1
+  end
+
+  def self.set_color args
+    extra "setting color with #{args}"
+    @fg = args[0] || nil
   end
 
   def self.add *args
@@ -104,20 +110,23 @@ module VT
     end
     extra("Write to line\n%s", str[0...i].inspect)
 
+    # TODO: check that this does what it's meant to...
     return str[i..-1]
   end
 
   def self.clear_data *args
     extra("clearing data with %s", args)
     for i in 0...TERMHEIGHT
-      @line_contents[i] = " " * TERMWIDTH
+      @line_contents[i].each_index do |j|
+        @line_contents[i][j] = Glyph.new
+      end
     end
   end
 
   def self.clear_line *args
     extra("clearing line " + @row.to_s + " with %s", args.join)
-    for i in @col-1...TERMWIDTH
-      @line_contents[@row-1][i] = " "
+    for i in (@col-1)...TERMWIDTH
+      @line_contents[@row-1][i] = Glyph.new
     end
   end
 
@@ -134,15 +143,17 @@ module VT
   end
 
   def self.parse str
-    extra("BEGIN PARSE\n%s",str.inspect)
-    while str.length > 0
-      str = parse_escape str
-      extra("After parse_escape\n%s", str.inspect)
-      str = parse_text str
-      extra("After parse_text\n%s", str.inspect)
+    if str.length > 0
+      extra("BEGIN PARSE\n%s",str.inspect)
+      while str.length > 0
+        str = parse_escape str
+        extra("After parse_escape\n%s", str.inspect)
+        str = parse_text str
+        extra("After parse_text\n%s", str.inspect)
+      end
+      extra("END PARSE FRAME\n")
     end
     term dump_vt
-    extra("END PARSE FRAME\n")
   end
 
   def self.write_char char
@@ -154,25 +165,27 @@ module VT
     if char == "\b"
       decrement
     elsif char != "\r"
-      @line_contents[@row-1][@col-1] = char
+      @line_contents[@row-1][@col-1].char = char
+      @line_contents[@row-1][@col-1].color = @fg
       increment
     end
   end
 
-  def self.get_rows
+  def self.rows
     @line_contents
   end
 
-  def self.dump_vt
+  def self.dump_vt use_color = false
     # clear screen
     str = "\e[H\e[2J\e[H"
     for i,line in @line_contents
       str += "\e[" + (i+1).to_s + ";1H"
-      line.each_char do |c|
-        if c == "\e"
-          err("Escape in VT contents on line %s", line)
+      line.each do |glyph|
+        if use_color
+          color = glyph.color || "0"
+          str += "\e[#{color.to_s}m"
         end
-        str += c
+        str += glyph.to_s
       end
     end
     str += "\e[" + @row.to_s + ";" + @col.to_s + "H"
