@@ -160,7 +160,6 @@ module VT
         end
         extra("END PARSE FRAME\n")
       end
-      term dump_vt
     end
 
     def write_char char
@@ -182,7 +181,7 @@ module VT
       @line_contents
     end
 
-    def dump_vt use_color = true
+    def dump use_color = true
       # clear screen
       str = "\e[H\e[2J\e[H"
       for i,line in @line_contents

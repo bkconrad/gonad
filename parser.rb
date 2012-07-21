@@ -32,6 +32,8 @@ module Parser
   def self.parse str
     PERSISTENT_VT.parse str
     FRAME_VT.parse str
+    # log VT contents
+    term PERSISTENT_VT.dump unless str.empty?
 
     Knowledge.parse_message FRAME_VT.row(0)
 
