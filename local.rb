@@ -8,8 +8,8 @@ require 'pty'
 
 module Local
   
-  def self.start
-    if $options["wizard"]
+  def self.start args
+    if args[:wizard]
       childio = PTY.spawn("sudo -u wizard nethack -D")
     else
       childio = PTY.spawn("nethack")

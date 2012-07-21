@@ -1,21 +1,23 @@
 #!/usr/bin/env ruby
 require "pry"
-require "optparse"
 require "./local"
 require "./debug"
 require "./parser"
 require "./ai"
+require "./options"
 
 $options = {}
 class Gonad
   include AI
 
   def initialize
-    $options = ARGV.getopts("","loglevel:","wizard")
+    Options.parse
+    Debug.start(Options.get "loglevel")
     @interface = Local
-    @interface.start
+    @interface.start wizard: Options.get('wizard')
+
     @human_override = false
-    Debug.start
+
     play
     shutdown
   end

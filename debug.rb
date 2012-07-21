@@ -9,8 +9,8 @@ module Debug
   LOGBASENAMES = [ :raw, :term, :debug ]
   @@log_files = {}
 
-  def self.start
-    @@debuglevel = ($options["loglevel"] || DEBUG).to_i
+  def self.start debug_level = DEBUG
+    @@debuglevel = debug_level.to_i
 
     LOGBASENAMES.each do |base_name|
       open_log base_name
