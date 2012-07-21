@@ -1,5 +1,11 @@
 #!/usr/bin/env ruby
 require 'pty'
+
+# Interfaces are responsible for gathering some nethack output from a source,
+# and delivering the user input to that source if applicable.
+#
+# This interface assumes nethack is available in the current path
+
 module Local
   
   def self.start

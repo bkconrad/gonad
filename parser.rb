@@ -1,6 +1,15 @@
 require "./debug"
 require "./knowledge"
 require "./vt"
+
+# The Parser keeps track of the current state of the nethack output (inventory,
+# character creation, player action, etc.) and routes information to the
+# Knowledge base.
+#
+# The Parser is also responsible for handling interface-related actions, such
+# as pressing space when "--More--" is displayed, and navigating menus as
+# requested by the AI
+
 module Parser
 
   # a stack of parser states (waiting, inventory, main, etc)

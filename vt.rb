@@ -1,5 +1,9 @@
 require "./glyph"
 require "./debug"
+
+# VT takes nethack output from an Interface and produces a 2D array of Glyph s
+# and allows the Parser to query it using several utility functions
+
 module VT
   attr_accessor :row, :col, :fg, :bg
 

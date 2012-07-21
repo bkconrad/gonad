@@ -1,6 +1,12 @@
 require "./debug"
 require "./map"
 require "./player_status"
+
+# The Knowledge module recieves information from the Parser and acts to store
+# the programs collective knowledge of the present nethack universe. This includes
+# things such as the player's current state (as a PlayerStatus), as well as maps
+# of monster, item, and dungeon feature locations (as Map objects)
+
 module Knowledge
   @player = PlayerStatus.new
 
