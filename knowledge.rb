@@ -20,7 +20,7 @@ module Knowledge
     when "+", "|", "-"
       # TODO: distinguish between walls and doors
       @dungeon_map[row][col] = :wall
-    when "."
+    when ".","#"
       @dungeon_map[row][col] = :floor
     when " "
       #@dungeon_map[row][col] = :rock

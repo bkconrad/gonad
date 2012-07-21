@@ -19,4 +19,9 @@ class Glyph
   def to_s
     @char
   end
+
+  # return a string with ansi escape to print this glyph with its attributes
+  def to_ansi
+    "\e[#{@color}m#{@char}"
+  end
 end

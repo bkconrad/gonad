@@ -44,12 +44,13 @@ module Parser
 
     if result === nil
       # no handlers were triggered, we must be ready for input
-      row_glyphs = FRAME_VT.row_glyphs
-      for i in 1..22
+      row_glyphs = PERSISTENT_VT.row_glyphs
+      for i in 1..21
         row_glyphs[i].each_index do |j|
           Knowledge.parse_glyph row_glyphs[i][j], i, j
         end
       end
+      extra Knowledge.dungeon_map.dump
     end
 
     FRAME_VT.clear_data
