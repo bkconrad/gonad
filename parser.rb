@@ -4,7 +4,7 @@ require "./vt"
 
 # The Parser keeps track of the current state of the nethack output (inventory,
 # character creation, player action, etc.) and routes information to the
-# Knowledge base.
+# Knowledge base by scraping the screen.
 #
 # The Parser is also responsible for handling interface-related actions, such
 # as pressing space when "--More--" is displayed, and navigating menus as
@@ -12,20 +12,18 @@ require "./vt"
 
 module Parser
 
-  # a stack of parser states (waiting, inventory, main, etc)
-  @state_stack = []
+  @state = :startup
+  PARSER_STATES = [ :startup, :player_action, :inventory, :messages, :rendering ]
 
   LINEHANDLERS={ 1 => "top_line",
                 23 => "attribute_line",
                 24 => "status_line"}
 
-  ACTIONS = [ :handle_more ]
   def self.parse str
     VT.parse str
 
-    for action in ACTIONS
-      # this doesn't work for static methods.
-      result = Parser.send(action, str)
+    for action in [ :handle_more ]
+      result = Parser.send(action)
       return result unless result === nil
     end
     return nil
@@ -46,7 +44,7 @@ module Parser
     extra("Found status %s", str)
   end
 
-  def self.handle_more str
-    return /--More--/.match(str) ? ' ' : nil
+  def self.handle_more
+    return /--More--/.match(VT.all) ? ' ' : nil
   end
 end

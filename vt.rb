@@ -195,4 +195,14 @@ module VT
     str += "\e[" + @row.to_s + ";" + @col.to_s + "H"
     str
   end
+
+  # returns the full contents of the VT as a string, or nil if the VT is empty
+  def self.all
+    if @line_contents != nil
+      result = @line_contents.map do |index, line|
+        next line.join
+      end
+      return result.join
+    end
+  end
 end
