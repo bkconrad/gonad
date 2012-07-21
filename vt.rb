@@ -175,7 +175,7 @@ module VT
     @line_contents
   end
 
-  def self.dump_vt use_color = false
+  def self.dump_vt use_color = true
     # clear screen
     str = "\e[H\e[2J\e[H"
     for i,line in @line_contents

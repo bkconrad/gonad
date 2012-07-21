@@ -3,6 +3,9 @@ require "./knowledge"
 require "./vt"
 module Parser
 
+  # a stack of parser states (waiting, inventory, main, etc)
+  @state_stack = []
+
   LINEHANDLERS={ 1 => "top_line",
                 23 => "attribute_line",
                 24 => "status_line"}
@@ -10,6 +13,7 @@ module Parser
   ACTIONS = [ :handle_more ]
   def self.parse str
     VT.parse str
+
     for action in ACTIONS
       # this doesn't work for static methods.
       result = Parser.send(action, str)

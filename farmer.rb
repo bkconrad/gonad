@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+require "pry"
 require "optparse"
 require "./local"
 require "./debug"
@@ -58,6 +59,12 @@ class Farmer
     if input == "\x1D"
       @human_override = !@human_override
       return nil
+    elsif input == '$'
+      @interface.stop
+      binding.pry
+      system 'reset'
+      @interface.transmit "\x12"
+      @interface.continue
     end
     return input
   end

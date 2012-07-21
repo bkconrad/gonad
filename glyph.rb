@@ -3,15 +3,7 @@ class Glyph
   COLOR = {
     none: nil
   }
-  attr_accessor :char
-  attr_reader :color
-
-  def color= arg
-    if arg.is_a? Array
-      raise Exception
-    end
-    @color = arg
-  end
+  attr_accessor :char, :color
 
   def initialize char = ' ', color = COLOR[:none]
     @color = color

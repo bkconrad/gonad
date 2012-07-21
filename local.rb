@@ -12,14 +12,18 @@ module Local
     @childin = childio[1]
     @childpid = childio[2]
     @childin.write("y    Of      ")
-    system "stty cbreak </dev/tty >/dev/tty 2>&1";
-    system "stty -echo </dev/tty >/dev/tty 2>&1";
+    continue
   end
     
   def self.stop
     system "stty -cbreak </dev/tty >/dev/tty 2>&1";
     system "stty echo </dev/tty >/dev/tty 2>&1";
     system "reset"
+  end
+
+  def self.continue
+    system "stty cbreak </dev/tty >/dev/tty 2>&1";
+    system "stty -echo </dev/tty >/dev/tty 2>&1";
   end
 
   def self.receive

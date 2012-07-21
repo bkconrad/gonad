@@ -1,9 +1,26 @@
 require "./debug"
+require "./map"
 require "./player_status"
 module Knowledge
   @player = PlayerStatus.new
 
+  @dungeon_map = Map.new
+
   ATTRIBUTES_REGEX=/^(\w+)?.*?St:(\d+(?:\/(?:\*\*|\d+))?) Dx:(\d+) Co:(\d+) In:(\d+) Wi:(\d+) Ch:(\d+)\s*(\w+)\s*(.*)$/
+
+  # Identify glyph and update the necessary knowledge maps
+  def self.parse_glyph glyph, row, col
+    case glyph
+    when "+", "|", "-"
+      # TODO: distinguish between walls and doors
+      @dungeon_map[row][col] = :wall
+    when "."
+      @dungeon_map[row][col] = :floor
+    when " "
+      @dungeon_map[row][col] = :rock
+    end
+  end
+
   def self.parse_message str
   end
 
