@@ -55,11 +55,13 @@ class Gonad
       return
     end
 
-    # ^[ toggles human input
-    if input == "\x1D"
+    case input 
+    # ^] toggles human input
+    when "\x1D"
       @human_override = !@human_override
       return nil
-    elsif input == '$'
+    # $ drops to the pry debug prompt
+    when '$'
       @interface.stop
       binding.pry
       system 'reset'
