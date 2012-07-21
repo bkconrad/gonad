@@ -7,7 +7,7 @@ require "./parser"
 require "./ai"
 
 $options = {}
-class Farmer
+class Gonad
   include AI
 
   def initialize
@@ -70,4 +70,4 @@ class Farmer
   end
 end
 
-Farmer.new
+Gonad.new
