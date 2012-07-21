@@ -1,12 +1,11 @@
-# I'd rather make this an enum
-NONE = 0
-ERROR = 1
-LOG = 2
-WARN = 3
-DEBUG = 4
-EXTRA = 5
-
 module Debug
+  NONE = 0
+  ERROR = 1
+  LOG = 2
+  WARN = 3
+  DEBUG = 4
+  EXTRA = 5
+
   LOGBASENAMES = [ :raw, :term, :debug ]
   @@log_files = {}
 
@@ -19,7 +18,7 @@ module Debug
   end
 
   def self.open_log base_name
-    new_file = open("./#{base_name}.log", "w")
+    new_file = open("./log/#{base_name}.log", "w")
     @@log_files[base_name] = new_file
   end
 
@@ -54,24 +53,27 @@ module Debug
     @@log_files[:term].print(str)   
   end
 end
-  
+
+# global utility logging functions
 def log str, *args
-  Debug.log LOG, str, *args
+  Debug.log Debug::LOG, str, *args
 end
 
 def err str, *args
-  Debug.log ERROR, str, *args
+  Debug.log Debug::ERROR, str, *args
   exit
 end
 
 def dbg str, *args
-  Debug.log DEBUG, str, *args
+  Debug.log Debug::DEBUG, str, *args
 end
 
 def extra str, *args
-  Debug.log EXTRA, str, *args
+  Debug.log Debug::EXTRA, str, *args
 end
 
 def term str
   Debug.term str
 end
+
+#TODO: raw() is missing. is there a reason?
