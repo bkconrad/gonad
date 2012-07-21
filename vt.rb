@@ -177,7 +177,7 @@ module VT
       end
     end
 
-    def rows
+    def row_glyphs
       @line_contents
     end
 
