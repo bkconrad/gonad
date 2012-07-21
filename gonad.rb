@@ -60,8 +60,8 @@ class Gonad
     when "\x1D"
       @human_override = !@human_override
       return nil
-    # $ drops to the pry debug prompt
-    when '$'
+    # ` drops to the pry debug prompt
+    when '`'
       @interface.stop
       binding.pry
       system 'reset'
