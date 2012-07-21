@@ -19,8 +19,23 @@ module Parser
                 23 => "attribute_line",
                 24 => "status_line"}
 
+  # contains the contents of the VT as a player would see them
+  PERSISTENT_VT = VT::VTBuffer.new
+
+  # contains data printed to the VT since the last Parser frame
+  FRAME_VT = VT::VTBuffer.new
+
+  # scrape the VT for the currently displayed info. This assumes that the
+  # current state of nethack is waiting for user input (i.e. that all printing
+  # to the screen is finished until the player does something)
+
   def self.parse str
-    VT.parse str
+    PERSISTENT_VT.parse str
+    FRAME_VT.parse str
+
+    Knowledge.parse_message FRAME_VT.row(0)
+
+    FRAME_VT.clear_data
 
     for action in [ :handle_more ]
       result = Parser.send(action)
@@ -45,6 +60,6 @@ module Parser
   end
 
   def self.handle_more
-    return /--More--/.match(VT.all) ? ' ' : nil
+    return /--More--/.match(PERSISTENT_VT.all) ? ' ' : nil
   end
 end

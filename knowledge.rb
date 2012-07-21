@@ -28,6 +28,7 @@ module Knowledge
   end
 
   def self.parse_message str
+    dbg "found message\n'#{str}'" unless str.strip.empty?
   end
 
   def self.parse_attributes str
