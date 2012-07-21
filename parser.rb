@@ -35,13 +35,18 @@ module Parser
 
     Knowledge.parse_message FRAME_VT.row(0)
 
-    FRAME_VT.clear_data
-
     for action in [ :handle_more ]
       result = Parser.send(action)
-      return result unless result === nil
+      break if result != nil
     end
-    return nil
+
+    if result === nil
+      # no handlers were triggered, we must be ready for input
+    end
+
+    FRAME_VT.clear_data
+
+    return result
   end
 
   def self.parse_top_line str, chunk
@@ -60,6 +65,6 @@ module Parser
   end
 
   def self.handle_more
-    return /--More--/.match(PERSISTENT_VT.all) ? ' ' : nil
+    return /--More--/.match(FRAME_VT.all) ? ' ' : nil
   end
 end
