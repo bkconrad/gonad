@@ -74,4 +74,6 @@ class Gonad
   end
 end
 
-Gonad.new
+if __FILE__ == $0
+  Gonad.new
+end
