@@ -41,8 +41,9 @@ module Debug
     print(@@log_files[:debug], message, *args) if @@debuglevel >= level
   end
 
-  def self.raw (str, *args)
+  def self.raw (raw_str, *args)
     # TODO: wtf does this do...
+    str = String.new raw_str
     while str.sub!(/([^%])%([^%])/,"\\1%%\\2")
     end
     print(@@log_files[:raw], str + "\n", *args)

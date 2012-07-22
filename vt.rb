@@ -187,7 +187,7 @@ module VT
 
     def write_char char
       unless (1..TERMHEIGHT).cover?(@row) && (1..TERMWIDTH).cover?(@col)
-        dbg("Position %s,%s out of range", @row, @col)
+        err("Position %s,%s out of range", @row, @col)
         return
       end
 

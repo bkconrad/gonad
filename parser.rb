@@ -30,6 +30,8 @@ module Parser
   # to the screen is finished until the player does something)
 
   def self.parse str
+    return if str.empty?
+
     PERSISTENT_VT.parse str
     FRAME_VT.parse str
     # log VT contents
