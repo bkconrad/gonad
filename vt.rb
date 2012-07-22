@@ -13,7 +13,7 @@ module VT
            "B" => {add: [1, 0]},
            "C" => {add: [0, 1]},
            "D" => {add: [0, -1]},
-           "m" => {set_color: /\e\[(\d+)m/},
+           "m" => {set_sgr: /\e\[(\d*);?(\d*)m/},
            "h" => nil,
            "J" => {clear_data: /\e\[(\d)*J/},
            "H" => {set: /\e\[(\d*);?(\d*)H/},
@@ -56,9 +56,32 @@ module VT
       @col = col.to_i unless col == -1
     end
 
-    def set_color args
-      extra "setting color with #{args}"
-      @fg = args[0] || nil
+    # sets the current SGR (Select Graphic Rendition) properties such as color,
+    # bold/normal, foreground color, etc
+
+    def set_sgr args
+      if args === []
+        extra "resetting style and color"
+        @style = Glyph::STYLE[:normal]
+        @fg = Glyph::COLOR[:default]
+      end
+      for arg in args
+        if arg === ''
+          next
+        end
+
+        if arg.to_i === 0
+          extra "resetting style and color"
+          @style = Glyph::STYLE[:normal]
+          @fg = Glyph::COLOR[:default]
+        elsif (Glyph::STYLE[:bold]..Glyph::STYLE[:normal]).cover? arg.to_i
+          extra "setting style to #{arg}"
+          @style = arg
+        else
+          extra "setting color to #{arg}"
+          @fg = arg
+        end
+      end
     end
 
     def add *args
@@ -173,6 +196,7 @@ module VT
       elsif char != "\r"
         @line_contents[@row-1][@col-1].char = char
         @line_contents[@row-1][@col-1].color = @fg
+        @line_contents[@row-1][@col-1].style = @style
         increment
       end
     end
@@ -181,17 +205,13 @@ module VT
       @line_contents
     end
 
-    def dump use_color = true
+    def dump
       # clear screen
       str = "\e[H\e[2J\e[H"
       for i,line in @line_contents
         str += "\e[" + (i+1).to_s + ";1H"
         line.each do |glyph|
-          if use_color
-            color = glyph.color || "0"
-            str += "\e[#{color.to_s}m"
-          end
-          str += glyph.to_s
+          str += glyph.to_ansi
         end
       end
       str += "\e[" + @row.to_s + ";" + @col.to_s + "H"

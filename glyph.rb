@@ -1,13 +1,29 @@
 #!/usr/bin/env ruby
 class Glyph
   COLOR = {
-    none: nil
+    none: 39,
+    black: 30,
+    red: 31,
+    green: 32,
+    brown: 33,
+    blue: 34,
+    magenta: 35,
+    cyan: 36,
+    gray: 37
   }
-  attr_accessor :char, :color
 
-  def initialize char = ' ', color = COLOR[:none]
+  STYLE = {
+    none: 22,
+    invert: 7,
+    bold: 1,
+    normal: 22
+  }
+  attr_accessor :char, :color, :style
+
+  def initialize char = ' ', color = COLOR[:none], style = STYLE[:none]
     @color = color
     @char = char
+    @style = style
   end
 
   def <=> arg
@@ -22,6 +38,6 @@ class Glyph
 
   # return a string with ansi escape to print this glyph with its attributes
   def to_ansi
-    "\e[#{@color}m#{@char}"
+    return "\e[#{@style};#{@color}m#{@char}"
   end
 end
