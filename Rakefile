@@ -1,3 +1,5 @@
+desc "run unit tests"
+task :default
 task :test do
   $LOAD_PATH << File.dirname(__FILE__)
   Dir.glob("test/*.rb").each do |filename|
@@ -5,6 +7,7 @@ task :test do
   end
 end
 
+desc "generate rdoc"
 task :doc do
   Process.spawn 'rdoc --exclude="(test|util)/.*"'
   Process.wait
