@@ -43,7 +43,7 @@ module VT
     def initialize
       @line_contents = []
       for i in 0..TERMHEIGHT
-        @line_contents[i] = [].fill Glyph.new, 0...TERMWIDTH
+        @line_contents[i] = [].fill(0, TERMWIDTH) { Glyph.new }
       end
 
       @row = 1

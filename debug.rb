@@ -8,6 +8,7 @@ module Debug
 
   LOGBASENAMES = [ :raw, :term, :debug ]
   @@log_files = {}
+  @@debuglevel = LOG
 
   def self.start debug_level = DEBUG
     @@debuglevel = debug_level.to_i
