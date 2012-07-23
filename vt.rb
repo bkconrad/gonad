@@ -9,16 +9,33 @@ module VT
   # a clearable buffer with individual cursor and glyph state tracking
   class VTBuffer
     ESC="\e"
+
+    # a map of ANSI escape codes to the methods that implement them. values may
+    # be either a symbol, a hash, or nil. if a symbol is found, it is taken as
+    # the method name, if a hash is found, the first (only) key is the method
+    # name, and the value is an array of arguments to be passed. if nil is
+    # found, the escape code is ignored
+
     CODES={"A" => {add: [-1, 0]},
            "B" => {add: [1, 0]},
            "C" => {add: [0, 1]},
            "D" => {add: [0, -1]},
-           "m" => {set_sgr: /\e\[(\d*);?(\d*)m/},
+           "m" => :set_sgr,
            "h" => nil,
-           "J" => {clear_data: /\e\[(\d)*J/},
-           "H" => {set: /\e\[(\d*);?(\d*)H/},
-           "K" => {clear_line: /\e\[(\d)*K/}
+           "J" => :clear_data,
+           "H" => :set,
+           "K" => :clear_line
     }
+
+    # regex to match any recognized escape code character
+    ESCAPECODEREGEX = Regexp.new("[#{CODES.keys.join}]")
+
+    # regex to match parameters inside of an escape
+    ESCAPEPARAMETERREGEX = /(\d+);?/
+
+    # regex to match an escape code which begins the test string
+    # matches the code specifier
+    ESCAPEREGEX = /^\x1B\[[\d;]*([\w])/
 
     TERMWIDTH=80
     TERMHEIGHT=24
@@ -39,14 +56,8 @@ module VT
       "%i, %i" % [@row, @col]
     end
 
-    def set *args
-      if args[0].kind_of? Array
-        row = args[0][0]
-        col = args[0][1]
-      else
-        row = args[0]
-        col = args[1]
-      end
+    def set row = 1, col = 1, extra = nil
+      extra("set received #{row},#{col},#{extra}")
       if row == ""
         row = 1
       end
@@ -58,10 +69,10 @@ module VT
       @col = col.to_i unless col == -1
     end
 
-    # sets the current SGR (Select Graphic Rendition) properties such as color,
-    # bold/normal, foreground color, etc
+    # sets the current SGR (Select Graphic Rendition) properties such as
+    # background color, bold/normal, foreground color, etc
 
-    def set_sgr args
+    def set_sgr *args
       if args === []
         extra "resetting style and color"
         @style = Glyph::STYLE[:normal]
@@ -86,51 +97,51 @@ module VT
       end
     end
 
-    def add *args
-      if args[0].kind_of? Array
-        row = args[0][0]
-        col = args[0][1]
-      else
-        row = args[0]
-        col = args[1]
-      end
+    def add row, col
       @row += row.to_i
       @col += col.to_i
     end
 
     def parse_escape str
-      unless str[0] == ESC
+
+      escape_sequence = ESCAPEREGEX.match(str)
+
+      unless escape_sequence
         extra "parse_escape called on string not starting with ESC\n%s", str
         return str
       end
 
-      i = 1
-      while !CODES.include?(str[i])
-        if str[i] == ESC
-          err("unexpected escape in %s", str[0..i])
-        end
-        if i >= str.length
-          err("Unclosed escape sequence\n%s", str)
-        end
-        i += 1
-      end
-      extra("Found escape code %s", str[0..i])
+      action = escape_sequence.captures[0]
+      method_specifier = CODES[action]
+      method_args = nil
 
-      action = CODES[str[i]]
-      if action != nil
-        method = action.keys[0]
-        method_args = action[method]
-
-        if method_args.kind_of?(Regexp)
-          matches = method_args.match(str[0..i])
-          method_args = matches.to_a[1..-1]
-        end
-
-        self.send(method, method_args)
-        extra("Set cursor position to %s", position)
+      case method_specifier
+      when Symbol
+        method = method_specifier
+      when Hash
+        method = method_specifier.keys[0]
+        method_args = method_specifier.values[0]
+      when nil
+        # TODO: handle the do-nothing case
       end
 
-      return str[i+1..-1]
+      # if nil, we search for the parameters using the regex and pass them as an
+      # array
+      if method_args === nil
+        method_args = []
+
+        # start after the "\e["
+        i = 2
+        while parameter_match = escape_sequence.to_s[i..-1].match(ESCAPEPARAMETERREGEX)
+          method_args.push parameter_match.captures[0]
+          i += parameter_match.captures[0].length
+        end
+      end
+
+      self.send(method, *method_args)
+      extra("Set cursor position to %s", position)
+
+      return str[(escape_sequence.to_s.length)..-1]
     end
 
     def parse_text str
