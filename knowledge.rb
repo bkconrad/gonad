@@ -16,15 +16,7 @@ module Knowledge
 
   # Identify glyph and update the necessary knowledge maps
   def self.parse_glyph glyph, row, col
-    case glyph.char
-    when "+", "|", "-"
-      # TODO: distinguish between walls and doors
-      @dungeon_map[row][col] = :wall
-    when ".","#"
-      @dungeon_map[row][col] = :floor
-    when " "
-      #@dungeon_map[row][col] = :rock
-    end
+    @dungeon_map[row][col] = glyph.to_thing
   end
 
   def self.parse_message str

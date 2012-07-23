@@ -24,13 +24,15 @@ module VT
     TERMHEIGHT=24
 
     def initialize
-      @line_contents = {}
+      @line_contents = []
       for i in 0..TERMHEIGHT
         @line_contents[i] = [].fill Glyph.new, 0...TERMWIDTH
       end
 
       @row = 1
       @col = 1
+      @fg = Glyph::COLOR[:none]
+      @style = Glyph::STYLE[:normal]
     end
 
     def position
@@ -63,7 +65,7 @@ module VT
       if args === []
         extra "resetting style and color"
         @style = Glyph::STYLE[:normal]
-        @fg = Glyph::COLOR[:default]
+        @fg = Glyph::COLOR[:none]
       end
       for arg in args
         if arg === ''
@@ -73,7 +75,7 @@ module VT
         if arg.to_i === 0
           extra "resetting style and color"
           @style = Glyph::STYLE[:normal]
-          @fg = Glyph::COLOR[:default]
+          @fg = Glyph::COLOR[:none]
         elsif (Glyph::STYLE[:bold]..Glyph::STYLE[:normal]).cover? arg.to_i
           extra "setting style to #{arg}"
           @style = arg
@@ -208,9 +210,9 @@ module VT
     def dump
       # clear screen
       str = "\e[H\e[2J\e[H"
-      for i,line in @line_contents
+      @line_contents.each_index do |i|
         str += "\e[" + (i+1).to_s + ";1H"
-        line.each do |glyph|
+        @line_contents[i].each do |glyph|
           str += glyph.to_ansi
         end
       end
@@ -223,7 +225,7 @@ module VT
 
     def all
       if @line_contents != nil
-        result = @line_contents.map do |index, line|
+        result = @line_contents.map do |line|
           next line.join
         end
         return result.join
