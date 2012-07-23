@@ -4,3 +4,8 @@ task :test do
     load filename
   end
 end
+
+task :doc do
+  Process.spawn 'rdoc --exclude="(test|util)/.*"'
+  Process.wait
+end
