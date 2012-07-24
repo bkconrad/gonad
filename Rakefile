@@ -9,6 +9,6 @@ end
 
 desc "generate rdoc"
 task :doc do
-  Process.spawn 'rdoc --exclude="(test|util)/.*"'
+  Process.spawn 'rdoc --exclude=".*(test|util)/.*"'
   Process.wait
 end
