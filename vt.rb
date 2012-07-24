@@ -61,15 +61,10 @@ module VT
       return [@row, @col]
     end
 
-    def set row = 1, col = 1, extra = nil
-      extra("set received #{row},#{col},#{extra}")
-      if row == ""
-        row = 1
-      end
-      if col == ""
-        col = 1
-      end
+    # set the cursors position, defaulting to the origin if no arguments are
+    # passed.  TODO: determine what the third argument being passed means
 
+    def set row = 1, col = 1, *args
       @row = row.to_i unless row == -1
       @col = col.to_i unless col == -1
     end
