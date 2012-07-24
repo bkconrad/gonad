@@ -3,9 +3,9 @@ module AI
   @@tasks = []
   @@parameters = []
   class Direction
-    DIRECTIONS = [%w{y k u},
-                  %w{h . l},
-                  %w{b j n}]
+    DIRECTIONS = [%w(y k u),
+                  %w(h . l),
+                  %w(b j n)]
 
     def self.random
       return DIRECTIONS[rand(3)][rand(3)]
