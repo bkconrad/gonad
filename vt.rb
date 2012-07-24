@@ -56,6 +56,11 @@ module VT
       "%i, %i" % [@row, @col]
     end
 
+    # get position as an array
+    def get
+      return [@row, @col]
+    end
+
     def set row = 1, col = 1, extra = nil
       extra("set received #{row},#{col},#{extra}")
       if row == ""

@@ -1,11 +1,15 @@
 #!/usr/bin/env ruby
 
-# a utility to class to echo a string and wait for input, allowing automated
+# a utility to echo a string and wait for input, allowing automated
 # testing of the VT module
 
 class Echo
   def initialize
-    puts gets
+    input = ""
+    while input != "\n"
+      input = STDIN.getc
+      print input
+    end
   end
 end
 
