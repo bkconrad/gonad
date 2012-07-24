@@ -18,6 +18,8 @@ class Map < Array
           result += "."
         when :wall
           result += "+"
+        when :door
+          result += "%"
         else
           result += " "
         end
