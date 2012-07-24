@@ -7,7 +7,6 @@ require 'pty'
 # This interface assumes nethack is available in the current path
 
 module Local
-  
   def self.start args
     if args[:wizard]
       childio = PTY.spawn("sudo -u wizard nethack -D")
@@ -22,14 +21,12 @@ module Local
   end
     
   def self.stop
-    system "stty -cbreak </dev/tty >/dev/tty 2>&1";
-    system "stty echo </dev/tty >/dev/tty 2>&1";
+    system "stty -cbreak -raw echo </dev/tty >/dev/tty 2>&1";
     system "reset"
   end
 
   def self.continue
-    system "stty cbreak </dev/tty >/dev/tty 2>&1";
-    system "stty -echo </dev/tty >/dev/tty 2>&1";
+    system "stty cbreak raw -echo </dev/tty >/dev/tty 2>&1";
   end
 
   def self.receive

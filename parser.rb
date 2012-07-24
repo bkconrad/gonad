@@ -19,11 +19,17 @@ module Parser
                 23 => "attribute_line",
                 24 => "status_line"}
 
+  # the stream that takes in our data
+  STREAM = VT102::Stream.new
+
   # contains the contents of the VT as a player would see them
-  PERSISTENT_VT = VT::VTBuffer.new
+  ACCUM_SCREEN = VT102::Screen.new
 
   # contains data printed to the VT since the last Parser frame
-  FRAME_VT = VT::VTBuffer.new
+  FRAME_SCREEN = VT102::Screen.new
+
+  STREAM.attach(ACCUM_SCREEN)
+  STREAM.attach(FRAME_SCREEN)
 
   # scrape the VT for the currently displayed info. This assumes that the
   # current state of nethack is waiting for user input (i.e. that all printing
@@ -31,13 +37,12 @@ module Parser
 
   def self.parse str
     return if str.empty?
+    FRAME_SCREEN.clear_data
+    STREAM.process str
 
-    PERSISTENT_VT.parse str
-    FRAME_VT.parse str
     # log VT contents
-    term PERSISTENT_VT.dump unless str.empty?
-
-    Knowledge.parse_message FRAME_VT.row(0)
+    term ACCUM_SCREEN unless str.empty?
+    Knowledge.parse_message FRAME_SCREEN.row_glyphs(1).join
 
     for action in [ :handle_more ]
       result = Parser.send(action)
@@ -46,16 +51,15 @@ module Parser
 
     if result === nil
       # no handlers were triggered, we must be ready for input
-      row_glyphs = PERSISTENT_VT.row_glyphs
       for i in 1..21
-        row_glyphs[i].each_index do |j|
-          Knowledge.parse_glyph row_glyphs[i][j], i, j
+        ACCUM_SCREEN.contents[i].each_index do |j|
+          Knowledge.parse_glyph ACCUM_SCREEN.contents[i][j], i, j
         end
       end
       extra Knowledge.dungeon_map.dump
     end
 
-    FRAME_VT.clear_data
+    FRAME_SCREEN.clear_data
 
     return result
   end
@@ -76,6 +80,6 @@ module Parser
   end
 
   def self.handle_more
-    return /--More--/.match(FRAME_VT.all) ? ' ' : nil
+    return /--More--/.match(FRAME_SCREEN.all) ? ' ' : nil
   end
 end

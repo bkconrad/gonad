@@ -64,6 +64,22 @@ module VT102
       end
     end
 
+    # returns the glyphs comprising the given row number, and throws an error
+    # if row number is not in the range of the current screen
+
+    def row_glyphs row_num
+      unless (1..@rows).cover? row_num
+        raise Exception "Row #{row_num} is out of range (max #{@rows})"
+      end
+      @contents[row_num - 1]
+    end
+
+    # returns the contents of the VT as a string without line breaks
+
+    def all
+      @contents.flatten.join
+    end
+
     def position
       [ @row, @col ]
     end
@@ -286,7 +302,7 @@ module VT102
     # escape parameter mode handler
 
     def escape_parameters char
-      /[^0-9;]/.match char
+      /[^0-9;?]/.match char
       case char
       when $&
         # if the character is not a parameter or separator, it must be a
@@ -304,8 +320,16 @@ module VT102
       when ';'
         @parameters.push @current_parameter.to_i
         @current_parameter = ""
+      when '?'
+        @state = :mode
       else
         @current_parameter += char
+      end
+    end
+
+    def mode char
+      if ['l', 'h'].include? char
+        @state = :stream
       end
     end
 
@@ -316,19 +340,6 @@ module VT102
     # get position as an array
     def get
       return [@row, @col]
-    end
-
-    # set the cursors position, defaulting to the origin if no arguments are
-    # passed.  TODO: determine what the third argument being passed means
-
-    def set row = 1, col = 1, *args
-      @row = row.to_i unless row == -1
-      @col = col.to_i unless col == -1
-    end
-
-    def add row, col
-      @row += row.to_i
-      @col += col.to_i
     end
 
     def clear_line *args
