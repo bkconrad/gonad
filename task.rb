@@ -68,7 +68,6 @@ class Task
       result = ""
       arr[1..-1].each do |tile|
         delta = [ tile[0] - start[0], tile[1] - start[1] ]
-        puts delta.to_s
         result += Direction::DIRECTIONS[delta[0] + 1][delta[1] + 1]
         start = tile
       end
