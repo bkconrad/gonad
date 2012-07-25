@@ -147,7 +147,7 @@ class Task
     end
 
     def complete?
-      if @keys.length <= 0
+      if (!@keys) || @keys.length <= 0
         return true
       end
     end
