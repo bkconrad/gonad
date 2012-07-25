@@ -1,6 +1,7 @@
 require "./debug"
 require "./map"
 require "./player_status"
+require "./event_bus"
 
 # The Knowledge module recieves information from the Parser and acts to store
 # the programs collective knowledge of the present nethack universe. This includes
@@ -13,8 +14,15 @@ module Knowledge
   @dungeon_map = Map.new
   @down_stairs = nil
 
+  # callbacks
+  EventBus.on :down_stairs, ->() do
+    @dungeon_map.fill_nil
+  end
+
   ATTRIBUTES_REGEX=/^(\w+)?.*?St:(\d+(?:\/(?:\*\*|\d+))?) Dx:(\d+) Co:(\d+) In:(\d+) Wi:(\d+) Ch:(\d+)\s*(\w+)\s*(.*)$/
 
+  # retrieves the location of the down stairs on this level
+  # XXX: this is a shim
   def self.down_stairs
     @down_stairs
   end
@@ -31,6 +39,9 @@ module Knowledge
 
   def self.parse_message str
     dbg "found message\n'#{str}'" unless str.strip.empty?
+    if str.match /(You fall through...|down the stairs)/
+      EventBus.fire :down_stairs
+    end
   end
 
   def self.parse_attributes str

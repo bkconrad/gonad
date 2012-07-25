@@ -24,6 +24,7 @@ module EventBus
   # intention that errors are triggered when arguments don't match up. this is
   # a measure against argument-safety loss inherent in an event bus.
   def fire event, *data
+    dbg "firing event '#{event}'"
     (@callbacks[event] || []).each do |callback|
       callback.call *data
     end

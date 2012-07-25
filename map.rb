@@ -4,6 +4,10 @@ class Map < Array
   COLS = 80
 
   def initialize
+    fill_nil
+  end
+
+  def fill_nil
     fill 0...ROWS do |index|
       [].fill 0...COLS, nil
     end
