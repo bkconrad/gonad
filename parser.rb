@@ -11,7 +11,6 @@ require "./vt"
 # requested by the AI
 
 module Parser
-
   @state = :startup
   PARSER_STATES = [ :startup, :player_action, :inventory, :messages, :rendering ]
 
@@ -50,16 +49,19 @@ module Parser
     end
 
     if result === nil
-      # no handlers were triggered, we must be ready for input
-      for i in 1..21
-        ACCUM_SCREEN.contents[i].each_index do |j|
-          Knowledge.parse_glyph ACCUM_SCREEN.contents[i][j], i, j
+      # no handlers were triggered, we must be ready for input, and everything
+      # printed should be map info
+      for i in 2..21
+        for j in 1..79
+          Knowledge.parse_glyph ACCUM_SCREEN.glyph(i, j), i - 1, j
         end
       end
+      # The VT's cursor position should be on top of the player
+      # We must translate from screen coords to world coords
+      screen_row, screencol = ACCUM_SCREEN.position
+      Knowledge.player.position = [screen_row - 1, screencol]
       extra Knowledge.dungeon_map.dump
     end
-
-    FRAME_SCREEN.clear_data
 
     return result
   end

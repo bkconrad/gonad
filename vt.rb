@@ -64,6 +64,15 @@ module VT102
       end
     end
 
+    # return the glyph at screen position (i, j)
+    def glyph i, j
+      unless (1..@rows).cover?(i) && (1..@cols).cover?(j)
+        raise Exception "Row #{i} is out of range (max #{@rows})"
+      end
+      @contents[i - 1][j - 1]
+    end
+
+
     # returns the glyphs comprising the given row number, and throws an error
     # if row number is not in the range of the current screen
 
@@ -72,6 +81,14 @@ module VT102
         raise Exception "Row #{row_num} is out of range (max #{@rows})"
       end
       @contents[row_num - 1]
+    end
+
+    # returns a single row as a joined string of plain characters
+    def row_contents row_num
+      unless (1..@rows).cover? row_num
+        raise Exception "Row #{row_num} is out of range (max #{@rows})"
+      end
+      @contents[row_num - 1].join
     end
 
     # returns the contents of the VT as a string without line breaks

@@ -71,8 +71,8 @@ class Map < Array
 
   # returns the entity at row, col (1-indexed as always)
 
-  def get row, col
-    self[row - 1][col - 1]
+  def get i, j
+    self[i - 1][j - 1]
   end
 
   # returns an array of adjacent tiles which exist on the map

@@ -20,12 +20,12 @@ module Knowledge
   end
 
   # Identify glyph and update the necessary knowledge maps
-  def self.parse_glyph glyph, row, col
+  def self.parse_glyph glyph, i, j
     if glyph.to_thing != :unknown
-      @dungeon_map[row][col] = glyph.to_thing
+      @dungeon_map[i - 1][j - 1] = glyph.to_thing
     end
-    if @dungeon_map[row][col] == :down_stairs
-      @down_stairs = [row, col]
+    if @dungeon_map[i - 1][j - 1] == :down_stairs
+      @down_stairs = [i, j]
     end
   end
 
@@ -57,6 +57,10 @@ module Knowledge
   # returns the string of movement characters to get from row1, col1 to row2,
   # col2 in the dungeon
   def self.find_path row1, col1, row2, col2
+  end
+
+  def self.player
+    @player
   end
 
   def self.dungeon_map

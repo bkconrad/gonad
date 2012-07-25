@@ -90,9 +90,9 @@ module AI
       result
     end
 
-    def initialize row, col, start_row, start_col
+    def initialize row, col
       @target = [row, col]
-      @origin = [start_row, start_col]
+      @origin = Knowledge.player.position
 
       # find path using A*
       @main_list = []
@@ -130,12 +130,17 @@ module AI
         end
       end
 
-      # use the data from the A* search to construct shortest path
+      # use the data from the A* search to construct shortest path.
+      # the first point is the starting point.
       pos = @origin
       @path = [@origin]
       while pos != @target
         candidates = adjacent_tiles pos[0], pos[1], @main_list
         best = candidates[0]
+
+        # no candidates means no path available
+        raise Exception unless best
+
         for tile in candidates
           if tile[2] < best[2]
             best = tile
