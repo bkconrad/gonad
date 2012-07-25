@@ -4,6 +4,7 @@ require "./local"
 require "./debug"
 require "./parser"
 require "./ai"
+require "./task"
 require "./options"
 
 $options = {}
@@ -28,7 +29,7 @@ class Gonad
   end
 
   def play
-    add_task Explore.new
+    add_task Task::Explore.new
     while @interface.running?
       # get and log interface output
       received = @interface.receive
