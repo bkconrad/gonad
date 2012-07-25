@@ -10,6 +10,8 @@ module GlyphMap
     ['|', :none, :normal ]  => :wall,
     [' ', :none, :normal ]  => :rock,
     ['.', :none, :normal ]  => :floor,
+    ['>', :none, :normal ]  => :down_stairs,
+    ['<', :none, :normal ]  => :up_stairs,
     ['#', :none, :normal ]  => :floor
   }
 

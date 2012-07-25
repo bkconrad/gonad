@@ -1,4 +1,8 @@
 require "./knowledge"
+
+# defines and tracks the various tasks and decisions necessary to progress
+# satisfactorily. all decision-making logic goes here, and this will be the
+# class to inherit from when creating custom AIs
 module AI
   @@tasks = []
   @@parameters = []
@@ -28,24 +32,167 @@ module AI
   end
 
   class Task
-    # returns the character sequence needed to perform the next step of the task  
-    def self.perform
+    # returns the character sequence needed to perform the next step of the
+    # task, or nil if the task is complete
+    def perform
+    end
+
+    # returns whether the task has completed
+    def complete?
+      false
+    end
+  end
+
+  class Explore < Task
+    def perform
+      if Knowledge.down_stairs == nil
+        # look for the stairs
+      else
+        # move to the stairs
+      end
+    end
+  end
+
+  class MoveTo < Task
+    attr_accessor :target, :main_list, :path, :keys
+
+    # select tile costs in array which are adjacent to the given point
+
+    def adjacent_tiles row, col, arr
+      arr.select do |tile|
+        next (row - tile[0]).abs <= 1 && (col - tile[1]).abs <= 1
+      end
+    end
+
+    # prune entries in arr which are less or equally efficient to an entry in
+    # @main_list
+
+    def path_filter arr
+      @main_list.each do |bar|
+        arr.select! do |candidate|
+          if [bar[0], bar[1]] == [candidate[0], candidate[1]] && bar[2] <= candidate[2] && !(bar.equal? candidate)
+            next false
+          end
+          next true
+        end
+      end
+    end
+
+    def tile_path_to_keys arr
+      start = arr[0]
+      result = ""
+      arr[1..-1].each do |tile|
+        delta = [ tile[0] - start[0], tile[1] - start[1] ]
+        puts delta.to_s
+        result += Direction::DIRECTIONS[delta[0] + 1][delta[1] + 1]
+        start = tile
+      end
+      result
+    end
+
+    def initialize row, col, start_row, start_col
+      @target = [row, col]
+      @origin = [start_row, start_col]
+
+      # find path using A*
+      @main_list = []
+      add_tile @target
+
+      done = false
+      @main_list.each do |master_tile|
+        if done
+          break
+        end
+
+        @tmp_list = Knowledge.dungeon_map.get_adjacent master_tile[0], master_tile[1]
+
+        # only consider floors
+        @tmp_list.select! do |pos|
+          next [:floor, :door, :down_stairs, :up_stairs].include?(Knowledge.dungeon_map.get pos[0], pos[1])
+        end
+
+        # initialize starting tile costs
+        @tmp_list.each { |tile| tile[2] = master_tile[2] + 1 }
+
+        # drop any tiles with same position and higher cost from main_list
+        path_filter @main_list
+
+        # drop any tiles with same position and higher cost from tmp_list
+        path_filter @tmp_list
+
+        # add all points in tmp_list to main_list
+        # stop if we hit the starting point
+        @tmp_list.each do |tile|
+          if @origin[0] == tile[0] && @origin[1] == tile[1]
+            done = true
+          end
+          @main_list.push tile
+        end
+      end
+
+      # use the data from the A* search to construct shortest path
+      pos = @origin
+      @path = [@origin]
+      while pos != @target
+        candidates = adjacent_tiles pos[0], pos[1], @main_list
+        best = candidates[0]
+        for tile in candidates
+          if tile[2] < best[2]
+            best = tile
+          end
+        end
+        pos = [best[0], best[1]]
+        @path.push pos
+      end
+
+      @keys = tile_path_to_keys @path
+    end
+
+    def perform
+      result = @keys[0]
+      @keys = @keys[1..-1]
+      dbg "use '#{result}' to move next"
+      result
+    end
+
+    def complete?
+      if @keys.length <= 0
+        return true
+      end
+    end
+
+    private
+
+    def add_tile position, cost = 0
+      @main_list.push [*position, cost]
     end
   end
 
   class Move < Task
     attr_accessor :direction
-    def self.perform
+    def perform
       super
       Direction.random
     end
   end
+  
+  # check current task's status, remove it if it's completed and return the
+  # steps to complete the new (or old) task
+  def perform_next_task
+    if next_task.complete?
+      dbg ("completed task #{next_task}")
+      @@tasks.pop
+      dbg ("now performing task #{next_task}")
+    end
+    return next_task.perform
+  end
 
   def next_task
-    return @@tasks[@@tasks.length-1]
+    return @@tasks.last
   end
 
   def add_task task
+    dbg ("adding task #{task}")
     @@tasks.push(task)
   end
 end

@@ -11,12 +11,22 @@ module Knowledge
   @player = PlayerStatus.new
 
   @dungeon_map = Map.new
+  @down_stairs = nil
 
   ATTRIBUTES_REGEX=/^(\w+)?.*?St:(\d+(?:\/(?:\*\*|\d+))?) Dx:(\d+) Co:(\d+) In:(\d+) Wi:(\d+) Ch:(\d+)\s*(\w+)\s*(.*)$/
 
+  def self.down_stairs
+    @down_stairs
+  end
+
   # Identify glyph and update the necessary knowledge maps
   def self.parse_glyph glyph, row, col
-    @dungeon_map[row][col] = glyph.to_thing
+    if glyph.to_thing != :unknown
+      @dungeon_map[row][col] = glyph.to_thing
+    end
+    if @dungeon_map[row][col] == :down_stairs
+      @down_stairs = [row, col]
+    end
   end
 
   def self.parse_message str
@@ -42,6 +52,11 @@ module Knowledge
   end
 
   def self.parse_status str
+  end
+
+  # returns the string of movement characters to get from row1, col1 to row2,
+  # col2 in the dungeon
+  def self.find_path row1, col1, row2, col2
   end
 
   def self.dungeon_map

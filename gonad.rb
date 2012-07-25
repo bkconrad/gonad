@@ -28,7 +28,7 @@ class Gonad
   end
 
   def play
-    add_task Move
+    add_task Explore.new
     while @interface.running?
       # get and log interface output
       received = @interface.receive
@@ -42,7 +42,7 @@ class Gonad
       if @human_override
         @interface.transmit human_input
       else
-        @interface.transmit(parser_instructions || next_task.perform)
+        @interface.transmit(parser_instructions || perform_next_task)
       end
 
       # TODO: we should wait for input, not sleep

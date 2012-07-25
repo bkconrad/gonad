@@ -44,7 +44,9 @@ module Local
   end
 
   def self.transmit str
+    return unless str
     @childin.write str
+    dbg "transmitting '#{str}'"
   end
 
   def self.running?
