@@ -26,4 +26,6 @@ module AI
     dbg ("adding task #{task}")
     @@tasks.push(task)
   end
+
+  module_function :add_task
 end

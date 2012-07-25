@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+require './debug'
 
 class Task
 
@@ -78,6 +79,8 @@ class Task
       @target = [row, col]
       @origin = Knowledge.player.position
 
+      dbg "Find path from #{@origin} to #{@target}"
+
       # find path using A*
       @main_list = []
       add_tile @target
@@ -123,7 +126,7 @@ class Task
         best = candidates[0]
 
         # no candidates means no path available
-        raise Exception unless best
+        return nil unless best
 
         for tile in candidates
           if tile[2] < best[2]
@@ -156,12 +159,17 @@ class Task
       @main_list.push [*position, cost]
     end
   end
+
   class Explore < Task
     def perform
       if Knowledge.down_stairs == nil
         # look for the stairs
+        return Direction.random
+      elsif Knowledge.player.position == Knowledge.down_stairs
+        return ">"
       else
-        # move to the stairs
+        AI.add_task MoveTo.new(*Knowledge.down_stairs)
+        return nil
       end
     end
   end
