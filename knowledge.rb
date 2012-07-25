@@ -2,6 +2,7 @@ require "./debug"
 require "./map"
 require "./player_status"
 require "./event_bus"
+require "./messages"
 
 # The Knowledge module recieves information from the Parser and acts to store
 # the programs collective knowledge of the present nethack universe. This includes
@@ -38,9 +39,11 @@ module Knowledge
   end
 
   def self.parse_message str
-    dbg "found message\n'#{str}'" unless str.strip.empty?
-    if str.match /(You fall through...|down the stairs)/
-      EventBus.fire :down_stairs
+    MESSAGES.each do |re, event|
+      if str.match re
+        EventBus.fire event
+        return
+      end
     end
   end
 
