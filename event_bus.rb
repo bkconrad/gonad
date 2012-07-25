@@ -15,6 +15,7 @@ module EventBus
   #   EventBus.on :foo, ->(x) { |x| puts "foo triggered with #{x}" }
   #   EventBus.fire :foo, 'one', 'two'
   def on event, callback
+    raise Exception, "Non-lambda event passed" unless callback.lambda?
     @callbacks[event] ||= [] 
     @callbacks[event].push callback
   end

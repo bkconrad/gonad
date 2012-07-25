@@ -39,10 +39,16 @@ class EventBusTest < Test::Unit::TestCase
       refute called2
     end
 
-    should "throw an error on mismatched arguments" do
+    should "raise an error on mismatched arguments" do
       assert_raise ArgumentError do
         EventBus.on :foo, ->(x) { called = x }
         EventBus.fire :foo
+      end
+    end
+
+    should "raise an error on non-lambda callbacks" do
+      assert_raise Exception do
+        EventBus.on :foo, proc { |x| called = x }
       end
     end
 
